@@ -83,7 +83,7 @@ enum custom_keycodes {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT_moonlander(
     TT(4),          KC_Q,           KC_W,           KC_B,           KC_J,           KC_BSLASH,      KC_AMPR,                                        KC_TILD,        ST_MACRO_0,     KC_DQUO,        KC_QUOTE,       KC_GRAVE,       ST_MACRO_1,     LGUI(KC_L),     
-    KC_ESCAPE,      KC_K,           KC_P,           KC_D,           KC_H,           KC_LBRACKET,    KC_RBRACKET,                                    KC_DLR,         KC_DOT,         KC_Y,           KC_U,           KC_O,           KC_SLASH,       KC_PGUP,        
+    KC_ESCAPE,      KC_K,           KC_P,           KC_D,           KC_H,           KC_LBRACKET,    KC_RBRACKET,                                    KC_DLR,         KC_COMMA,       KC_Y,           KC_U,           KC_O,           KC_SLASH,       KC_PGUP,        
     KC_CAPSLOCK,    KC_S,           KC_E,           KC_L,           KC_F,           KC_LPRN,        KC_RPRN,                                                                        KC_EXLM,        KC_DOT,         KC_A,           KC_I,           KC_T,           KC_R,           KC_PGDOWN,      
     TG(2),          KC_Z,           KC_X,           KC_C,           KC_V,           KC_G,                                           KC_UNDS,        KC_N,           KC_M,           KC_EQUAL,       KC_MINUS,       TG(2),          
     KC_LCTRL,       KC_LGUI,        KC_LALT,        TT(2),          LM(1,MOD_LSFT), KC_LCTRL,                                                                                                       KC_RCTRL,       LM(1,MOD_RSFT), TT(2),          KC_RALT,        LT(3,KC_PSCREEN),KC_RCTRL,       
