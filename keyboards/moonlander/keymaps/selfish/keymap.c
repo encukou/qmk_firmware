@@ -49,12 +49,12 @@ enum custom_keycodes {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT_moonlander(
-    KC_EQUAL,       KC_1,           KC_2,           KC_3,           KC_4,           KC_5,           KC_LEFT,                                        KC_RIGHT,       KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           KC_MINUS,       
+    KC_GRAVE,       KC_1,           KC_2,           KC_3,           KC_4,           KC_5,           KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           KC_MINUS,       
     KC_DELETE,      KC_Q,           KC_W,           KC_E,           KC_R,           KC_T,           TG(1),                                          TG(1),          KC_Y,           KC_U,           KC_I,           KC_O,           KC_P,           KC_BSLASH,      
-    KC_BSPACE,      KC_A,           KC_S,           KC_D,           KC_F,           KC_G,           KC_HYPR,                                                                        KC_MEH,         KC_H,           KC_J,           KC_K,           KC_L,           LT(2,KC_SCOLON),LGUI_T(KC_QUOTE),
-    KC_LSHIFT,      LCTL_T(KC_Z),   KC_X,           KC_C,           KC_V,           KC_B,                                           KC_N,           KC_M,           KC_COMMA,       KC_DOT,         RCTL_T(KC_SLASH),KC_RSHIFT,      
-    LT(1,KC_GRAVE), WEBUSB_PAIR,    LALT(KC_LSHIFT),KC_LEFT,        KC_RIGHT,       LALT_T(KC_APPLICATION),                                                                                                LCTL_T(KC_ESCAPE),KC_UP,          KC_DOWN,        KC_LBRACKET,    KC_RBRACKET,    MO(1),          
-    KC_SPACE,       KC_BSPACE,      KC_LGUI,                        KC_LALT,        KC_TAB,         KC_ENTER
+    KC_SCROLLLOCK,  KC_A,           KC_S,           KC_D,           KC_F,           KC_G,           KC_HYPR,                                                                        KC_MEH,         KC_H,           KC_J,           KC_K,           KC_L,           KC_SCOLON,      KC_QUOTE,       
+    KC_LSHIFT,      KC_Z,           KC_X,           KC_C,           KC_V,           KC_B,                                           KC_N,           KC_M,           KC_COMMA,       KC_DOT,         KC_SLASH,       KC_RSHIFT,      
+    OSL(1),         WEBUSB_PAIR,    KC_TRANSPARENT, KC_LEFT,        KC_RIGHT,       KC_LALT,                                                                                                        KC_LCTRL,       KC_UP,          KC_DOWN,        KC_LBRACKET,    KC_RBRACKET,    OSL(1),         
+    KC_SPACE,       KC_BSPACE,      KC_PSCREEN,                     KC_RALT,        KC_TAB,         KC_ENTER
   ),
   [1] = LAYOUT_moonlander(
     KC_ESCAPE,      KC_F1,          KC_F2,          KC_F3,          KC_F4,          KC_F5,          KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_F6,          KC_F7,          KC_F8,          KC_F9,          KC_F10,         KC_F11,         
@@ -74,6 +74,52 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 };
 
+extern bool g_suspend_state;
+extern rgb_config_t rgb_matrix_config;
+
+void keyboard_post_init_user(void) {
+  rgb_matrix_enable();
+}
+
+const uint8_t PROGMEM ledmap[][DRIVER_LED_TOTAL][3] = {
+    [0] = { {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {154,86,255}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {154,86,255}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {154,86,255}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {154,86,255}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {154,86,255}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {154,86,255}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {154,86,255}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {154,86,255}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {154,86,255}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {154,86,255}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0} },
+
+    [1] = { {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {20,177,225}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {20,177,225}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {20,177,225}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {20,177,225}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {20,177,225}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {20,177,225}, {20,177,225}, {0,0,0}, {0,0,0}, {0,0,0}, {20,177,225}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {20,177,225}, {50,153,244}, {50,153,244}, {50,153,244}, {0,0,0}, {20,177,225}, {50,153,244}, {50,153,244}, {50,153,244}, {0,0,0}, {20,177,225}, {50,153,244}, {50,153,244}, {50,153,244}, {0,0,0}, {20,177,225}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0} },
+
+};
+
+void set_layer_color(int layer) {
+  for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
+    HSV hsv = {
+      .h = pgm_read_byte(&ledmap[layer][i][0]),
+      .s = pgm_read_byte(&ledmap[layer][i][1]),
+      .v = pgm_read_byte(&ledmap[layer][i][2]),
+    };
+    if (!hsv.h && !hsv.s && !hsv.v) {
+        rgb_matrix_set_color( i, 0, 0, 0 );
+    } else {
+        RGB rgb = hsv_to_rgb( hsv );
+        float f = (float)rgb_matrix_config.hsv.v / UINT8_MAX;
+        rgb_matrix_set_color( i, f * rgb.r, f * rgb.g, f * rgb.b );
+    }
+  }
+}
+
+void rgb_matrix_indicators_user(void) {
+  if (g_suspend_state || keyboard_config.disable_layer_led) { return; }
+  switch (biton32(layer_state)) {
+    case 0:
+      set_layer_color(0);
+      break;
+    case 1:
+      set_layer_color(1);
+      break;
+   default:
+    if (rgb_matrix_get_flags() == LED_FLAG_NONE)
+      rgb_matrix_set_color_all(0, 0, 0);
+    break;
+  }
+}
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
