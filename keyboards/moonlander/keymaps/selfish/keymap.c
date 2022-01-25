@@ -26,6 +26,9 @@
 #include "keymap_estonian.h"
 #include "keymap_belgian.h"
 #include "keymap_us_international.h"
+#include "keymap_croatian.h"
+#include "keymap_turkish_q.h"
+#include "keymap_slovak.h"
 
 #define KC_MAC_UNDO LGUI(KC_Z)
 #define KC_MAC_CUT LGUI(KC_X)
@@ -242,13 +245,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     break;
     case ST_MACRO_7:
     if (record->event.pressed) {
-      SEND_STRING(SS_LCTL(SS_TAP(X_U)) SS_DELAY(100) SS_TAP(X_0) SS_DELAY(100) SS_TAP(X_3) SS_DELAY(100) SS_TAP(X_B)  SS_DELAY(100) SS_TAP(X_ENTER));
+      SEND_STRING(SS_LCTL(SS_TAP(X_U)) SS_DELAY(100) SS_TAP(X_0) SS_DELAY(100) SS_TAP(X_0) SS_DELAY(100) SS_TAP(X_3) SS_DELAY(100) SS_TAP(X_B)  SS_DELAY(100) SS_TAP(X_ENTER));
 
     }
     break;
     case ST_MACRO_8:
     if (record->event.pressed) {
-      SEND_STRING(SS_LCTL(SS_TAP(X_U)) SS_DELAY(100) SS_TAP(X_A) SS_DELAY(100) SS_TAP(X_0)  SS_DELAY(100) SS_TAP(X_ENTER));
+      SEND_STRING(SS_LCTL(SS_TAP(X_U)) SS_DELAY(100) SS_TAP(X_0) SS_DELAY(100) SS_TAP(X_0) SS_DELAY(100) SS_TAP(X_A) SS_DELAY(100) SS_TAP(X_0)  SS_DELAY(100) SS_TAP(X_ENTER));
 
     }
     break;
