@@ -248,7 +248,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     break;
     case ST_MACRO_7:
     if (record->event.pressed) {
-      SEND_STRING(SS_LCTL(SS_TAP(X_U)) SS_DELAY(U_MACRO_DELAY) SS_TAP(X_0) SS_DELAY(U_MACRO_DELAY) SS_TAP(X_0) SS_DELAY(U_MACRO_DELAY) SS_TAP(X_3) SS_DELAY(U_MACRO_DELAY) SS_TAP(X_B)  SS_DELAY(U_MACRO_DELAY) SS_TAP(X_ENTER));
+        if (get_mods() & (MOD_BIT(KC_LSHIFT))) {
+            // Unshifted semicolon
+            unregister_code(KC_LSHIFT);
+            register_code(KC_SEMICOLON);
+            register_code(KC_LSHIFT);
+            return false;
+        } else {
+            register_code(KC_SEMICOLON);
+            return false;
+        }
+    } else {
+        unregister_code(KC_SEMICOLON);
+        return false;
     }
     break;
     case ST_MACRO_8:
