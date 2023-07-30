@@ -155,9 +155,6 @@ void set_layer_color(int layer) {
 }
 
 void rgb_matrix_indicators_user(void) {
-  if (rawhid_state.rgb_control) {
-      return;
-  }
   if (keyboard_config.disable_layer_led) { return; }
   switch (biton32(layer_state)) {
     case 0:
@@ -199,9 +196,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     break;
 
     case RGB_SLD:
-        if (rawhid_state.rgb_control) {
-            return false;
-        }
         if (record->event.pressed) {
             rgblight_mode(1);
         }
