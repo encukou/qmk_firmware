@@ -1,4 +1,4 @@
-#ifdef RGB_MATRIX_ENABLE
+#ifdef ORYX_ENABLE
 RGB_MATRIX_EFFECT(oryx_webhid_effect)
 #    ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 

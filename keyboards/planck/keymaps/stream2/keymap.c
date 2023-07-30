@@ -33,6 +33,8 @@
 #include "keymap_turkish_q.h"
 #include "keymap_slovak.h"
 
+#include "raw_hid.h"
+
 #define KC_MAC_UNDO LGUI(KC_Z)
 #define KC_MAC_CUT LGUI(KC_X)
 #define KC_MAC_COPY LGUI(KC_C)
@@ -71,44 +73,44 @@ enum planck_layers {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_BASE] = LAYOUT_planck_grid(
-    KC_TAB,         KC_Q,           KC_W,           KC_E,           KC_R,           KC_T,           KC_Y,           KC_U,           KC_I,           KC_O,           KC_P,           KC_BSPACE,      
-    KC_ESCAPE,      KC_A,           KC_S,           KC_D,           KC_F,           KC_G,           KC_H,           KC_J,           KC_K,           KC_L,           KC_SCOLON,      KC_QUOTE,       
-    KC_LSHIFT,      KC_Z,           KC_X,           KC_C,           KC_V,           KC_B,           KC_N,           KC_M,           KC_COMMA,       KC_DOT,         KC_SLASH,       KC_ENTER,       
+    KC_TAB,         KC_Q,           KC_W,           KC_E,           KC_R,           KC_T,           KC_Y,           KC_U,           KC_I,           KC_O,           KC_P,           KC_BSPACE,
+    KC_ESCAPE,      KC_A,           KC_S,           KC_D,           KC_F,           KC_G,           KC_H,           KC_J,           KC_K,           KC_L,           KC_SCOLON,      KC_QUOTE,
+    KC_LSHIFT,      KC_Z,           KC_X,           KC_C,           KC_V,           KC_B,           KC_N,           KC_M,           KC_COMMA,       KC_DOT,         KC_SLASH,       KC_ENTER,
     TT(4),          KC_LCTRL,       KC_LALT,        KC_LGUI,        TT(1),          KC_SPACE,       KC_NO,          TT(2),          KC_LEFT,        KC_DOWN,        KC_UP,          KC_RIGHT
   ),
 
   [_LOWER] = LAYOUT_planck_grid(
-    KC_TILD,        KC_EXLM,        KC_AT,          KC_HASH,        KC_DLR,         KC_PERC,        KC_CIRC,        KC_AMPR,        KC_ASTR,        KC_LPRN,        KC_RPRN,        KC_TRANSPARENT, 
-    KC_DELETE,      KC_INSERT,      KC_SCROLLLOCK,  KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_UNDS,        KC_PLUS,        KC_LCBR,        KC_RCBR,        KC_HOME,        
-    KC_TRANSPARENT, KC_APPLICATION, ST_MACRO_0,     ST_MACRO_1,     KC_MS_ACCEL0,   KC_MS_ACCEL1,   KC_MS_ACCEL2,   KC_NONUS_HASH,  KC_MS_BTN1,     KC_MS_BTN3,     KC_MS_BTN2,     KC_END,         
+    KC_TILD,        KC_EXLM,        KC_AT,          KC_HASH,        KC_DLR,         KC_PERC,        KC_CIRC,        KC_AMPR,        KC_ASTR,        KC_LPRN,        KC_RPRN,        KC_TRANSPARENT,
+    KC_DELETE,      KC_INSERT,      KC_SCROLLLOCK,  KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_UNDS,        KC_PLUS,        KC_LCBR,        KC_RCBR,        KC_HOME,
+    KC_TRANSPARENT, KC_APPLICATION, ST_MACRO_0,     ST_MACRO_1,     KC_MS_ACCEL0,   KC_MS_ACCEL1,   KC_MS_ACCEL2,   KC_NONUS_HASH,  KC_MS_BTN1,     KC_MS_BTN3,     KC_MS_BTN2,     KC_END,
     KC_COMMA,       KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_NO,          TT(2),          KC_MS_LEFT,     KC_MS_DOWN,     KC_MS_UP,       KC_MS_RIGHT
   ),
 
   [_RAISE] = LAYOUT_planck_grid(
-    KC_GRAVE,       KC_1,           KC_2,           KC_3,           KC_4,           KC_5,           KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           KC_TRANSPARENT, 
-    KC_DELETE,      KC_F1,          KC_F2,          KC_F3,          KC_F4,          KC_F5,          KC_F6,          KC_MINUS,       KC_EQUAL,       KC_LBRACKET,    KC_RBRACKET,    KC_PGUP,        
-    KC_TRANSPARENT, KC_F7,          KC_F8,          KC_F9,          KC_F10,         KC_F11,         KC_F12,         KC_NONUS_HASH,  KC_NONUS_BSLASH,KC_TRANSPARENT, KC_BSLASH,      KC_PGDOWN,      
+    KC_GRAVE,       KC_1,           KC_2,           KC_3,           KC_4,           KC_5,           KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           KC_TRANSPARENT,
+    KC_DELETE,      KC_F1,          KC_F2,          KC_F3,          KC_F4,          KC_F5,          KC_F6,          KC_MINUS,       KC_EQUAL,       KC_LBRACKET,    KC_RBRACKET,    KC_PGUP,
+    KC_TRANSPARENT, KC_F7,          KC_F8,          KC_F9,          KC_F10,         KC_F11,         KC_F12,         KC_NONUS_HASH,  KC_NONUS_BSLASH,KC_TRANSPARENT, KC_BSLASH,      KC_PGDOWN,
     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_NO,          KC_TRANSPARENT, KC_MS_WH_LEFT,  KC_MS_WH_DOWN,  KC_MS_WH_UP,    KC_MS_WH_RIGHT
   ),
 
   [_ADJUST] = LAYOUT_planck_grid(
-    KC_F1,          KC_F2,          KC_F3,          KC_F4,          KC_F5,          KC_F6,          KC_F7,          KC_F8,          KC_F9,          KC_F10,         KC_F11,         KC_F12,         
-    KC_F13,         KC_F14,         KC_F15,         KC_F16,         KC_F17,         KC_F18,         KC_F19,         KC_F20,         KC_F21,         KC_F22,         KC_F23,         KC_F24,         
-    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_AUDIO_MUTE,  KC_AUDIO_VOL_DOWN,KC_AUDIO_VOL_UP,KC_TRANSPARENT, 
+    KC_F1,          KC_F2,          KC_F3,          KC_F4,          KC_F5,          KC_F6,          KC_F7,          KC_F8,          KC_F9,          KC_F10,         KC_F11,         KC_F12,
+    KC_F13,         KC_F14,         KC_F15,         KC_F16,         KC_F17,         KC_F18,         KC_F19,         KC_F20,         KC_F21,         KC_F22,         KC_F23,         KC_F24,
+    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_AUDIO_MUTE,  KC_AUDIO_VOL_DOWN,KC_AUDIO_VOL_UP,KC_TRANSPARENT,
     WEBUSB_PAIR,    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_NO,          KC_TRANSPARENT, KC_MEDIA_STOP,  KC_MEDIA_PREV_TRACK,KC_MEDIA_NEXT_TRACK,KC_MEDIA_PLAY_PAUSE
   ),
 
   [_LAYER4] = LAYOUT_planck_grid(
     LALT(LGUI(LCTL(LSFT(KC_R)))),LALT(LGUI(LCTL(LSFT(KC_S)))),KC_NO,          KC_NO,          KC_NO,          KC_NO,          LALT(LGUI(LCTL(LSFT(KC_D)))),KC_NO,          KC_NO,          LALT(LGUI(LCTL(LSFT(KC_M)))),LALT(LGUI(LCTL(LSFT(KC_H)))),LALT(LGUI(LCTL(LSFT(KC_E)))),
     KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          LALT(LGUI(LCTL(LSFT(KC_1)))),LALT(LGUI(LCTL(LSFT(KC_2)))),LALT(LGUI(LCTL(LSFT(KC_3)))),LALT(LGUI(LCTL(LSFT(KC_4)))),LALT(LGUI(LCTL(LSFT(KC_5)))),LALT(LGUI(LCTL(LSFT(KC_6)))),
-    TT(5),          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          
+    TT(5),          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,
     KC_TRANSPARENT, KC_NO,          KC_NO,          KC_NO,          LALT(LGUI(LCTL(LSFT(KC_U)))),LALT(LGUI(LCTL(LSFT(KC_T)))),KC_NO,          KC_NO,          LALT(LGUI(LCTL(LSFT(KC_Q)))),KC_NO,          LALT(LGUI(LCTL(LSFT(KC_Z)))),LALT(LGUI(LCTL(LSFT(KC_Y))))
   ),
 
   [_LAYER5] = LAYOUT_planck_grid(
     KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          RGB_SLD,        RGB_SAI,        RGB_SAD,        KC_NO,          LALT(LGUI(LCTL(LSFT(KC_X)))),
-    KC_NO,          KC_NO,          AU_ON,          AU_OFF,         AU_TOG,         KC_NO,          KC_NO,          RGB_TOG,        RGB_VAI,        RGB_VAD,        KC_NO,          KC_NO,          
-    KC_TRANSPARENT, KC_NO,          MU_ON,          MU_OFF,         MU_TOG,         KC_NO,          KC_NO,          RGB_MOD,        RGB_HUI,        RGB_HUD,        KC_NO,          KC_NO,          
+    KC_NO,          KC_NO,          AU_ON,          AU_OFF,         AU_TOG,         KC_NO,          KC_NO,          RGB_TOG,        RGB_VAI,        RGB_VAD,        KC_NO,          KC_NO,
+    KC_TRANSPARENT, KC_NO,          MU_ON,          MU_OFF,         MU_TOG,         KC_NO,          KC_NO,          RGB_MOD,        RGB_HUI,        RGB_HUD,        KC_NO,          KC_NO,
     KC_TRANSPARENT, KC_NO,          KC_NO,          KC_NO,          KC_TRANSPARENT, KC_TRANSPARENT, KC_NO,          KC_TRANSPARENT, RGB_SPI,        RGB_SPD,        KC_NO,          RESET
   ),
 
@@ -137,8 +139,17 @@ const uint8_t PROGMEM ledmap[][DRIVER_LED_TOTAL][3] = {
 
 };
 
+RGB rec_color = {255, 255, 255};
+RGB live_color = {255, 255, 255};
+
 void set_layer_color(int layer) {
-  for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
+  int start = 0;
+  if (layer == 4) {
+      start = 2;
+      rgb_matrix_set_color(0, rec_color.r, rec_color.g, rec_color.b);
+      rgb_matrix_set_color(1, live_color.r, live_color.g, live_color.b);
+  }
+  for (int i = start; i < DRIVER_LED_TOTAL; i++) {
     HSV hsv = {
       .h = pgm_read_byte(&ledmap[layer][i][0]),
       .s = pgm_read_byte(&ledmap[layer][i][1]),
@@ -278,5 +289,33 @@ uint8_t layer_state_set_user(uint8_t state) {
     return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
 }
 
-
+void raw_hid_receive(uint8_t *data, uint8_t length) {
+    raw_hid_send(data, length);
+    if (length >= 2) {
+        if (data[0] == 'R') {
+            rec_color.r = 255;
+            rec_color.g = 0;
+            rec_color.b = 0;
+            rgb_matrix_indicators_user();
+        }
+        if (data[0] == 'r') {
+            rec_color.r = 0;
+            rec_color.g = 128;
+            rec_color.b = 128;
+            rgb_matrix_indicators_user();
+        }
+        if (data[1] == 'L') {
+            live_color.r = 255;
+            live_color.g = 0;
+            live_color.b = 0;
+            rgb_matrix_indicators_user();
+        }
+        if (data[1] == 'l') {
+            live_color.r = 0;
+            live_color.g = 128;
+            live_color.b = 128;
+            rgb_matrix_indicators_user();
+        }
+    }
+}
 
