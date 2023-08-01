@@ -139,17 +139,42 @@ const uint8_t PROGMEM ledmap[][DRIVER_LED_TOTAL][3] = {
 
 };
 
-RGB rec_color = {255, 255, 255};
-RGB live_color = {255, 255, 255};
+#define BLK {.r=0, .g=0, .b=0}
+#define WHI {.r=255, .g=255, .b=255}
+#define RED {.r=255, .g=0, .b=0}
+#define GRN {.r=0, .g=255, .b=0}
+#define BLU {.r=0, .g=0, .b=255}
+#define YLW {.r=255, .g=255, .b=0}
+#define MGT {.r=255, .g=0, .b=255}
+#define CYA {.r=0, .g=255, .b=255}
+
+RGB stream_colors[DRIVER_LED_TOTAL] = {
+    // .qwert
+    {255,255,255}, {255,225,255}, BLK, BLK, BLK, BLK,
+    // yuiop.
+    WHI, BLK, BLK, WHI, WHI, WHI,
+    // .asdfg
+    BLK, BLK, BLK, BLK, BLK, BLK,
+    // hjkl:"
+    RED, GRN, BLU, YLW, MGT, CYA,
+    // .zxcvb
+    RED, BLK, BLK, BLK, BLK, BLK,
+    // nm<>?.
+    BLK, BLK, BLK, BLK, BLK, BLK,
+    // OZXCV_
+    BLK, BLK, BLK, BLK, BLK, WHI,
+    // M<>?"
+    BLK, RED, BLK, YLW, YLW
+};
 
 void set_layer_color(int layer) {
-  int start = 0;
   if (layer == 4) {
-      start = 2;
-      rgb_matrix_set_color(0, rec_color.r, rec_color.g, rec_color.b);
-      rgb_matrix_set_color(1, live_color.r, live_color.g, live_color.b);
+    for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
+      rgb_matrix_set_color(i, stream_colors[i].r, stream_colors[i].g, stream_colors[i].b);
+    }
+    return;
   }
-  for (int i = start; i < DRIVER_LED_TOTAL; i++) {
+  for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
     HSV hsv = {
       .h = pgm_read_byte(&ledmap[layer][i][0]),
       .s = pgm_read_byte(&ledmap[layer][i][1]),
@@ -290,32 +315,14 @@ uint8_t layer_state_set_user(uint8_t state) {
 }
 
 void raw_hid_receive(uint8_t *data, uint8_t length) {
-    raw_hid_send(data, length);
-    if (length >= 2) {
-        if (data[0] == 'R') {
-            rec_color.r = 255;
-            rec_color.g = 0;
-            rec_color.b = 0;
-            rgb_matrix_indicators_user();
-        }
-        if (data[0] == 'r') {
-            rec_color.r = 0;
-            rec_color.g = 128;
-            rec_color.b = 128;
-            rgb_matrix_indicators_user();
-        }
-        if (data[1] == 'L') {
-            live_color.r = 255;
-            live_color.g = 0;
-            live_color.b = 0;
-            rgb_matrix_indicators_user();
-        }
-        if (data[1] == 'l') {
-            live_color.r = 0;
-            live_color.g = 128;
-            live_color.b = 128;
-            rgb_matrix_indicators_user();
-        }
+    //raw_hid_send(data, length);
+    for (int i = 0; i+3 < length; i += 4) {
+        int led_idx = data[i];
+        if (led_idx >= DRIVER_LED_TOTAL) break;
+        stream_colors[led_idx].r = data[i + 1];
+        stream_colors[led_idx].g = data[i + 2];
+        stream_colors[led_idx].b = data[i + 3];
     }
+    rgb_matrix_indicators_user();
 }
 
