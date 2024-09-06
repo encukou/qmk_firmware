@@ -20,7 +20,8 @@ bool cz = false;
 
 enum custom_keycodes {
     XZ_FN = SAFE_RANGE,
-    XZ_MKR
+    XZ_MKR,
+    XZ_MKRE
 };
 #define XZ_FN1 XZ_FN
 #define XZ_LT  XZ_FN
@@ -33,19 +34,29 @@ enum __layers {
     XYZZY_NUM,
 };
 
+#define CAPS_LED_INDEX 62
+#define NUM_LED_INDEX 37
+#define SCRL_LED_INDEX 14
+#define INPUT_LED_INDEX 40
+#define FN_LED_INDEX 100
+#define TGNUM_LED_INDEX 23
+#define MKR_LED_INDEX_START 16
+#define Y_LED_INDEX 47
+#define Z_LED_INDEX 79
+
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [XYZZY_B] = LAYOUT(
     KC_ESC,  XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,            XZ_FN,   XZ_FN,   XZ_FN,   XZ_MKR,  XZ_MKR,  XZ_MKR,  XZ_MKR,
     KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_INS,  KC_HOME, KC_PGUP, KC_U,    KC_D,    KC_G,    TG(XYZZY_CZ),
-    KC_TAB,  KC_A,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_DEL,  KC_END,  KC_PGDN, XZ_LT,   KC_N,    XZ_LT,   KC_I,
-    KC_CAPS, KC_Q,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,                             KC_W,    KC_Z,    KC_E,
+    KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_DEL,  KC_END,  KC_PGDN, XZ_LT,   KC_N,    XZ_LT,   KC_I,
+    KC_CAPS, KC_W,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,                             KC_W,    KC_Z,    KC_E,
     KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,                   KC_RSFT,          KC_UP,            XZ_LT,   KC_S,    XZ_LT,   KC_PENT,
     KC_LCTL, KC_LGUI, KC_LALT,                   KC_SPC,                             KC_RALT, KC_RGUI, MO(XYZZY_FN),     KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT,          KC_X,    KC_L),
 
   [XYZZY_CZ] = LAYOUT(
-    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, _______, _______, _______, _______, _______,
+    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, _______, XZ_MKRE, XZ_MKRE, XZ_MKRE, XZ_MKRE,
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,                            _______, KC_Y,    _______,
@@ -87,6 +98,14 @@ PROGMEM const char* magic_shift[MATRIX_ROWS][MATRIX_COLS] = LAYOUT(
 );
 // clang-format on
 
+typedef struct {
+    unsigned char size;
+    char recording;
+    keyrecord_t buf[32];
+} macro_t;
+
+macro_t macros[4] = {{0}};
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     bool shifted = get_mods() & MOD_MASK_SHIFT;
     uint8_t row = record->event.key.row;
@@ -94,7 +113,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
         switch (keycode) {
             case XZ_FN: {
-                if (shifted && magic[row][col]) {
+                if (shifted && magic_shift[row][col]) {
                     send_string_P(magic_shift[row][col]);
                     return false;
                 }
@@ -109,38 +128,37 @@ void keyboard_post_init_user(void) {
     rgb_matrix_mode(RGB_MATRIX_NONE);
 }
 
-/*
-#define CZ_LED_INDEX MAC_LED_INDEX
-#define EN_LED_INDEX MAC_LED_INDEX
 #define COLOR_WHITE 255, 255, 255
+#define COLOR_GRAY 100, 100, 100
 #define COLOR_BLACK 0, 0, 0
 
 bool rgb_matrix_indicators_user(void) {
-    if (host_keyboard_led_state().caps_lock) {
-        rgb_matrix_set_color(CAPS_LED_INDEX, COLOR_WHITE);
+    led_t led_state = host_keyboard_led_state();
+    if (led_state.caps_lock)    rgb_matrix_set_color(CAPS_LED_INDEX, COLOR_WHITE);
+    else                        rgb_matrix_set_color(CAPS_LED_INDEX, COLOR_BLACK);
+
+    if (led_state.num_lock)     rgb_matrix_set_color(NUM_LED_INDEX, COLOR_WHITE);
+    else                        rgb_matrix_set_color(NUM_LED_INDEX, COLOR_BLACK);
+
+    if (led_state.scroll_lock)  rgb_matrix_set_color(SCRL_LED_INDEX, COLOR_WHITE);
+    else                        rgb_matrix_set_color(SCRL_LED_INDEX, COLOR_BLACK);
+
+    if (IS_LAYER_ON(XYZZY_CZ)) {
+        rgb_matrix_set_color(INPUT_LED_INDEX, COLOR_WHITE);
+        rgb_matrix_set_color(Y_LED_INDEX, COLOR_GRAY);
+        rgb_matrix_set_color(Z_LED_INDEX, COLOR_GRAY);
     } else {
-        rgb_matrix_set_color(CAPS_LED_INDEX, COLOR_BLACK);
+        rgb_matrix_set_color(INPUT_LED_INDEX, COLOR_BLACK);
+        rgb_matrix_set_color(Y_LED_INDEX, COLOR_BLACK);
+        rgb_matrix_set_color(Z_LED_INDEX, COLOR_BLACK);
     }
-    if (host_keyboard_led_state().num_lock) {
-        if (host_keyboard_led_state().scroll_lock) {
-            rgb_matrix_set_color(NUM_LED_INDEX, 255, 255, 255);
-        } else {
-            rgb_matrix_set_color(NUM_LED_INDEX, 255, 255, 0);
-        }
-    } else {
-        if (host_keyboard_led_state().scroll_lock) {
-            rgb_matrix_set_color(NUM_LED_INDEX, 0, 0, 255);
-        } else {
-            rgb_matrix_set_color(NUM_LED_INDEX, 0, 0, 0);
-        }
-    }
-    if (cz) {
-        rgb_matrix_set_color(CZ_LED_INDEX, COLOR_WHITE);
-        rgb_matrix_set_color(EN_LED_INDEX, COLOR_BLACK);
-    } else {
-        rgb_matrix_set_color(CZ_LED_INDEX, COLOR_BLACK);
-        rgb_matrix_set_color(EN_LED_INDEX, COLOR_WHITE);
-    }
-    return true;
+
+    if (IS_LAYER_ON(XYZZY_FN))  rgb_matrix_set_color(FN_LED_INDEX, COLOR_WHITE);
+    else                        rgb_matrix_set_color(FN_LED_INDEX, COLOR_BLACK);
+
+    if (IS_LAYER_ON(XYZZY_NUM)) rgb_matrix_set_color(TGNUM_LED_INDEX, COLOR_WHITE);
+    else if (IS_LAYER_ON(XYZZY_FN)) rgb_matrix_set_color(TGNUM_LED_INDEX, COLOR_GRAY);
+    else                        rgb_matrix_set_color(TGNUM_LED_INDEX, COLOR_BLACK);
+
+    return false;
 }
-*/
