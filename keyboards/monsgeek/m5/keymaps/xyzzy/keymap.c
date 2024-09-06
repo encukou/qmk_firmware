@@ -17,16 +17,25 @@
 #include QMK_KEYBOARD_H
 
 bool cz = false;
-int current_brightness_index = 0;
-const unsigned char brightness_divisors[] = {4, 3, 2, 1, 255};
+
+#define BRIGHTNESS_LEVELS 3
+unsigned char current_brightness_index[2] = {0, 0};
+unsigned char current_brightness_low = 0;
+unsigned char current_brightness_high = 0;
+const unsigned char brightnesses_low[BRIGHTNESS_LEVELS] = {0, 100, 200};
+const unsigned char brightnesses_high[BRIGHTNESS_LEVELS][BRIGHTNESS_LEVELS] = {
+    {100, 200, 255},
+    {200, 230, 255},
+    {255, 255, 255},
+};
 #define ARRAY_LEN(a) (sizeof(a) / sizeof(a[0]))
 
 enum custom_keycodes {
     XZ_FN = SAFE_RANGE,
     XZ_MKR,
     XZ_REC,
-    XZ_BRID,
-    XZ_BRIU
+    XZ_BRIL,
+    XZ_BRIH
 };
 #define XZ_FN1 XZ_FN
 #define XZ_LT  XZ_FN
@@ -71,8 +80,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [XYZZY_FN] = LAYOUT(
     XZ_FN1,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,           KC_PSCR, KC_SCRL, KC_PAUS, XZ_REC,  XZ_REC,  XZ_REC,  XZ_REC,
-    _______, _______, _______, TGNUM,   _______, _______, _______, _______, _______, _______, _______, XZ_BRID, XZ_BRIU, XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,
-    XZ_FN1,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,
+    _______, _______, _______, TGNUM,   _______, _______, _______, _______, _______, _______, _______, _______, _______, XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,
+    XZ_FN1,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, XZ_BRIL, XZ_BRIH, _______, XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,
     XZ_FN1,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          XZ_FN1,                             XZ_FN1,  XZ_FN1,  XZ_FN1,
     XZ_FN1,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                   XZ_FN1,           XZ_FN1,           XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,
     XZ_FN1,  XZ_FN1,  XZ_FN1,                    XZ_FN1,                             XZ_FN1,  XZ_FN1,  _______,          XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,           XZ_FN1,  XZ_FN1),
@@ -104,9 +113,11 @@ PROGMEM const char* magic_shift[MATRIX_ROWS][MATRIX_COLS] = LAYOUT(
 );
 // clang-format on
 
-void update_brightness(int change) {
-    current_brightness_index += change + ARRAY_LEN(brightness_divisors);
-    current_brightness_index %= ARRAY_LEN(brightness_divisors);
+void update_brightness(void) {
+    current_brightness_index[0] %= BRIGHTNESS_LEVELS;
+    current_brightness_index[1] %= BRIGHTNESS_LEVELS;
+    current_brightness_low = brightnesses_low[current_brightness_index[0]];
+    current_brightness_high = brightnesses_high[current_brightness_index[0]][current_brightness_index[1]];
 }
 
 #define N_MACROS 4
@@ -126,8 +137,9 @@ void macro_play(int i) {
     clear_keyboard();
     layer_clear();
 
-    for (i = 0; i < macros[i].size; i++) {
-        process_record(&macros[i].buf[i]);
+    for (int j = 0; j < macros[i].size; j++) {
+        process_record(&(macros[i].buf[j]));
+        wait_ms(2);
     }
 
     clear_keyboard();
@@ -167,6 +179,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 } else {
                     send_string_P(magic[row][col]);
                 }
+                send_char(' ');
             } break;
             case XZ_REC: {
                 int i = col % N_MACROS;
@@ -175,7 +188,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 } else {
                     macro_recording_start(i);
                 }
-            } break;
+            } return false;
             case XZ_MKR: {
                 int i = col % N_MACROS;
                 if (macros[i].recording) {
@@ -185,9 +198,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 } else {
                     macro_play(i);
                 }
+            } return false;
+            case XZ_BRIL: {
+                current_brightness_index[0] += 1;
+                update_brightness();
             } break;
-            case XZ_BRIU: update_brightness(+1); break;
-            case XZ_BRID: update_brightness(-1); break;
+            case XZ_BRIH: {
+                current_brightness_index[1] += 1;
+                update_brightness();
+            } break;
         }
     }
     if (is_recording) {
@@ -209,18 +228,21 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 void keyboard_post_init_user(void) {
     rgb_matrix_mode_noeeprom(RGB_MATRIX_NONE);
+    update_brightness();
 }
 
-#define COLOR_WHITE 255/B, 255/B, 255/B
-#define COLOR_GRAY 100/B, 100/B, 100/B
-#define COLOR_RED 255/B, 0, 0
-#define COLOR_BLACK 0, 0, 0
+#define LO (current_brightness_low)
+#define HI (current_brightness_high)
+#define MD ((current_brightness_low + current_brightness_high) / 2)
+
+#define COLOR_WHITE HI, HI, HI
+#define COLOR_GRAY MD, MD, MD
+#define COLOR_RED HI, LO, LO
+#define COLOR_BLACK LO, LO, LO
 
 bool rgb_matrix_indicators_user(void) {
     led_t led_state = host_keyboard_led_state();
     rgb_matrix_set_color_all(COLOR_BLACK);
-
-    unsigned char B = brightness_divisors[current_brightness_index];
 
     if (led_state.caps_lock)    rgb_matrix_set_color(CAPS_LED_INDEX, COLOR_WHITE);
     else                        rgb_matrix_set_color(CAPS_LED_INDEX, COLOR_BLACK);
@@ -250,10 +272,12 @@ bool rgb_matrix_indicators_user(void) {
 
     for (int i = 0; i < N_MACROS; i++) {
         int led_index = MKR_LED_INDEX_START + (i + MKR_LED_OFFSET) % N_MACROS;
-        if (macros[i].recording) rgb_matrix_set_color(led_index, 255/B, 255 * macros[i].size / MACRO_BUF_SIZE / B, 0);
+        if (macros[i].recording) rgb_matrix_set_color(led_index, COLOR_RED);
         else if (macros[i].size) rgb_matrix_set_color(led_index, COLOR_WHITE);
         else                     rgb_matrix_set_color(led_index, COLOR_BLACK);
     }
 
     return false;
 }
+#undef A
+#undef B
