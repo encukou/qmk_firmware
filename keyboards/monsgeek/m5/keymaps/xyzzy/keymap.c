@@ -17,11 +17,16 @@
 #include QMK_KEYBOARD_H
 
 bool cz = false;
+int current_brightness_index = 0;
+const unsigned char brightness_divisors[] = {4, 3, 2, 1, 255};
+#define ARRAY_LEN(a) (sizeof(a) / sizeof(a[0]))
 
 enum custom_keycodes {
     XZ_FN = SAFE_RANGE,
     XZ_MKR,
-    XZ_MKRE
+    XZ_REC,
+    XZ_BRID,
+    XZ_BRIU
 };
 #define XZ_FN1 XZ_FN
 #define XZ_LT  XZ_FN
@@ -38,9 +43,10 @@ enum __layers {
 #define NUM_LED_INDEX 37
 #define SCRL_LED_INDEX 14
 #define INPUT_LED_INDEX 40
-#define FN_LED_INDEX 100
+#define FN_LED_INDEX 101
 #define TGNUM_LED_INDEX 23
 #define MKR_LED_INDEX_START 16
+#define MKR_LED_OFFSET 3
 #define Y_LED_INDEX 47
 #define Z_LED_INDEX 79
 
@@ -56,7 +62,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_LCTL, KC_LGUI, KC_LALT,                   KC_SPC,                             KC_RALT, KC_RGUI, MO(XYZZY_FN),     KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT,          KC_X,    KC_L),
 
   [XYZZY_CZ] = LAYOUT(
-    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, _______, XZ_MKRE, XZ_MKRE, XZ_MKRE, XZ_MKRE,
+    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, _______, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,                            _______, KC_Y,    _______,
@@ -64,8 +70,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     _______, _______, _______,                   _______,                            _______, _______, _______,          _______, _______, _______, _______,          _______, _______),
 
   [XYZZY_FN] = LAYOUT(
-    XZ_FN1,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,           KC_PSCR, KC_SCRL, KC_PAUS, _______, _______, _______, _______,
-    _______, _______, _______, TGNUM,   _______, _______, _______, _______, _______, _______, _______, _______, _______, XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,
+    XZ_FN1,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,           KC_PSCR, KC_SCRL, KC_PAUS, XZ_REC,  XZ_REC,  XZ_REC,  XZ_REC,
+    _______, _______, _______, TGNUM,   _______, _______, _______, _______, _______, _______, _______, XZ_BRID, XZ_BRIU, XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,
     XZ_FN1,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,
     XZ_FN1,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          XZ_FN1,                             XZ_FN1,  XZ_FN1,  XZ_FN1,
     XZ_FN1,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                   XZ_FN1,           XZ_FN1,           XZ_FN1,  XZ_FN1,  XZ_FN1,  XZ_FN1,
@@ -98,13 +104,56 @@ PROGMEM const char* magic_shift[MATRIX_ROWS][MATRIX_COLS] = LAYOUT(
 );
 // clang-format on
 
+void update_brightness(int change) {
+    current_brightness_index += change + ARRAY_LEN(brightness_divisors);
+    current_brightness_index %= ARRAY_LEN(brightness_divisors);
+}
+
+#define N_MACROS 4
+#define MACRO_BUF_SIZE 32
 typedef struct {
     unsigned char size;
     char recording;
-    keyrecord_t buf[32];
+    keyrecord_t buf[MACRO_BUF_SIZE];
 } macro_t;
 
-macro_t macros[4] = {{0}};
+macro_t macros[N_MACROS] = {{0}};
+int is_recording = 0;
+
+void macro_play(int i) {
+    layer_state_t saved_layer_state = layer_state;
+
+    clear_keyboard();
+    layer_clear();
+
+    for (i = 0; i < macros[i].size; i++) {
+        process_record(&macros[i].buf[i]);
+    }
+
+    clear_keyboard();
+
+    layer_state_set(saved_layer_state);
+}
+
+void macro_recording_start(int i) {
+    macros[i].recording = 1;
+    macros[i].size = 0;
+    is_recording = 1;
+}
+
+void macro_recording_stop(int i) {
+    macros[i].recording = 0;
+    while (macros[i].size && macros[i].buf[macros[i].size - 1].event.pressed) {
+        macros[i].size--;
+    }
+    for (int i = 0; i < N_MACROS; i++) {
+        if (macros[i].recording) {
+            is_recording = 1;
+            return;
+        }
+    }
+    is_recording = 0;
+}
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     bool shifted = get_mods() & MOD_MASK_SHIFT;
@@ -115,25 +164,64 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             case XZ_FN: {
                 if (shifted && magic_shift[row][col]) {
                     send_string_P(magic_shift[row][col]);
-                    return false;
+                } else {
+                    send_string_P(magic[row][col]);
                 }
-                send_string_P(magic[row][col]);
-            } return false;
+            } break;
+            case XZ_REC: {
+                int i = col % N_MACROS;
+                if (macros[i].recording) {
+                    macro_recording_stop(i);
+                } else {
+                    macro_recording_start(i);
+                }
+            } break;
+            case XZ_MKR: {
+                int i = col % N_MACROS;
+                if (macros[i].recording) {
+                    macro_recording_stop(i);
+                } else if (macros[i].size == 0) {
+                    macro_recording_start(i);
+                } else {
+                    macro_play(i);
+                }
+            } break;
+            case XZ_BRIU: update_brightness(+1); break;
+            case XZ_BRID: update_brightness(-1); break;
+        }
+    }
+    if (is_recording) {
+        for (int i = 0; i < N_MACROS; i++) {
+            if (macros[i].recording) {
+                if (!macros[i].size && !record->event.pressed) {
+                    continue;
+                }
+                macros[i].buf[macros[i].size] = *record;
+                macros[i].size++;
+                if (macros[i].size >= MACRO_BUF_SIZE) {
+                    macro_recording_stop(i);
+                }
+            }
         }
     }
     return true;
 }
 
 void keyboard_post_init_user(void) {
-    rgb_matrix_mode(RGB_MATRIX_NONE);
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_NONE);
 }
 
-#define COLOR_WHITE 255, 255, 255
-#define COLOR_GRAY 100, 100, 100
+#define COLOR_WHITE 255/B, 255/B, 255/B
+#define COLOR_GRAY 100/B, 100/B, 100/B
+#define COLOR_RED 255/B, 0, 0
 #define COLOR_BLACK 0, 0, 0
 
 bool rgb_matrix_indicators_user(void) {
     led_t led_state = host_keyboard_led_state();
+    rgb_matrix_set_color_all(COLOR_BLACK);
+
+    unsigned char B = brightness_divisors[current_brightness_index];
+
     if (led_state.caps_lock)    rgb_matrix_set_color(CAPS_LED_INDEX, COLOR_WHITE);
     else                        rgb_matrix_set_color(CAPS_LED_INDEX, COLOR_BLACK);
 
@@ -159,6 +247,13 @@ bool rgb_matrix_indicators_user(void) {
     if (IS_LAYER_ON(XYZZY_NUM)) rgb_matrix_set_color(TGNUM_LED_INDEX, COLOR_WHITE);
     else if (IS_LAYER_ON(XYZZY_FN)) rgb_matrix_set_color(TGNUM_LED_INDEX, COLOR_GRAY);
     else                        rgb_matrix_set_color(TGNUM_LED_INDEX, COLOR_BLACK);
+
+    for (int i = 0; i < N_MACROS; i++) {
+        int led_index = MKR_LED_INDEX_START + (i + MKR_LED_OFFSET) % N_MACROS;
+        if (macros[i].recording) rgb_matrix_set_color(led_index, 255/B, 255 * macros[i].size / MACRO_BUF_SIZE / B, 0);
+        else if (macros[i].size) rgb_matrix_set_color(led_index, COLOR_WHITE);
+        else                     rgb_matrix_set_color(led_index, COLOR_BLACK);
+    }
 
     return false;
 }
