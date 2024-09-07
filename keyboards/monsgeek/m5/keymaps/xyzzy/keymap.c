@@ -35,7 +35,9 @@ enum custom_keycodes {
     XZ_MKR,
     XZ_REC,
     XZ_BRIL,
-    XZ_BRIH
+    XZ_BRIH,
+    XZ_L,
+    XZ_Z
 };
 #define XZ_FN1 XZ_FN
 #define XZ_LT  XZ_FN
@@ -64,17 +66,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [XYZZY_B] = LAYOUT(
     KC_ESC,  XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,   XZ_FN,            XZ_FN,   XZ_FN,   XZ_FN,   XZ_MKR,  XZ_MKR,  XZ_MKR,  XZ_MKR,
-    KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_INS,  KC_HOME, KC_PGUP, KC_U,    KC_D,    KC_G,    TG(XYZZY_CZ),
-    KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_DEL,  KC_END,  KC_PGDN, XZ_LT,   KC_N,    XZ_LT,   KC_I,
-    KC_CAPS, KC_W,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,                             KC_W,    KC_Z,    KC_E,
-    KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,                   KC_RSFT,          KC_UP,            XZ_LT,   KC_S,    XZ_LT,   KC_PENT,
-    KC_LCTL, KC_LGUI, KC_LALT,                   KC_SPC,                             KC_RALT, KC_RGUI, MO(XYZZY_FN),     KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT,          KC_X,    KC_L),
+    KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_INS,  KC_HOME, KC_PGUP, XZ_L,    XZ_L,    XZ_L,    TG(XYZZY_CZ),
+    KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_DEL,  KC_END,  KC_PGDN, XZ_LT,   XZ_L,    XZ_LT,   KC_I,
+    KC_CAPS, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,                             XZ_L,    XZ_Z,    XZ_L,
+    KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,                   KC_RSFT,          KC_UP,            XZ_LT,   XZ_L,    XZ_LT,   KC_PENT,
+    KC_LCTL, KC_LGUI, KC_LALT,                   KC_SPC,                             KC_RALT, KC_RGUI, MO(XYZZY_FN),     KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT,          XZ_L,    XZ_L),
 
   [XYZZY_CZ] = LAYOUT(
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, _______, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,                            _______, KC_Y,    _______,
+    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,                            _______, _______, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                   _______,          _______,          _______, _______, _______, _______,
     _______, _______, _______,                   _______,                            _______, _______, _______,          _______, _______, _______, _______,          _______, _______),
 
@@ -96,20 +98,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 PROGMEM const char* magic[MATRIX_ROWS][MATRIX_COLS] = LAYOUT(
-    "ESCAPE","THROW", "PULL",  "CLOSE", "PRESS", "PICK",  "DRINK", "KICK", "TOUCH",  "SHOW", "TELL",   "CLIMB", "EMPTY",          "PRINT", "SCROLL","BREAK", NULL,    NULL,    NULL,    NULL,
-    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    "ERASE", "INSERT","HOME",  "PGUP",  "UP",    "DOWN",  "AGAIN",  "INPUT",
-    "JUMP",  NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    "DELETE","END",   "PGDN",  "NW",    "NORTH", "NE",    "INSPECT",
+    "ESCAPE","TAKE",  "PUSH",  "OPEN",  "HIT",  "PUT",   "EAT",    "TURN", "LISTEN", "TALK", "ASK",    "RUN",   "FILL",           "WRITE", "MOVE",  "MAKE",  NULL,    NULL,    NULL,    NULL,
+    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    "ERASE", "INSERT","HOME",  "PGUP",  "UP",    "DOWN",  "AGAIN", "INPUT",
+    "JUMP",  NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    "DELETE","END",   "PGDN",  "NW",    "NORTH", "NE",    "INV",
     "LOCK",  NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,             "ENTER",                            "WEST",  "WAIT",  "EAST",
     "SHIFT", NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,                      "SHIFT",          "PREVIOUS",       "SW",    "SOUTH", "SE",    "RETURN",
     "CONTROL","SYSTEM","OPTION",                 "SPACE",                            "OPTION","SYSTEM",NULL,            "CONTROL","LEFT",  "NEXT",  "RIGHT",          "EXAMINE","LOOK"
 );
 PROGMEM const char* magic_shift[MATRIX_ROWS][MATRIX_COLS] = LAYOUT(
-    NULL,    "TAKE",  "PUSH",  "OPEN",  "HIT",  "PUT",   "EAT",    "TURN", "LISTEN", "TALK", "ASK",    "RUN",   "FILL",           "WRITE", "MOVE",  "MAKE",  NULL,    NULL,    NULL,    NULL,
-    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,             NULL,                               NULL,    NULL,    NULL,
-    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,                      NULL,             NULL,             NULL,    NULL,    NULL,    NULL,
-    NULL,    NULL,    NULL,                      NULL,                               NULL,    NULL,    NULL,             NULL,    NULL,    NULL,    NULL,             NULL,    NULL
+    NULL,    "THROW", "PULL",  "CLOSE", "PRESS", "PICK",  "DRINK", "KICK", "TOUCH",  "SHOW", "TELL",   "CLIMB", "EMPTY",          "PRINT", "SCROLL","BREAK", NULL,    NULL,    NULL,    NULL,
+    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    "U",     "D",     "G",     NULL,
+    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    "N",     NULL,    NULL,
+    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,             NULL,                               "W",     NULL,    "E",
+    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,                      NULL,             NULL,             NULL,    "S",     NULL,    NULL,
+    NULL,    NULL,    NULL,                      NULL,                               NULL,    NULL,    NULL,             NULL,    NULL,    NULL,    NULL,             "X",     "L"
 );
 // clang-format on
 
@@ -158,13 +160,36 @@ void macro_recording_stop(int i) {
     while (macros[i].size && macros[i].buf[macros[i].size - 1].event.pressed) {
         macros[i].size--;
     }
-    for (int i = 0; i < N_MACROS; i++) {
-        if (macros[i].recording) {
+    for (int j = 0; j < N_MACROS; j++) {
+        if (macros[j].recording) {
             is_recording = 1;
             return;
         }
     }
     is_recording = 0;
+}
+
+void macro_recording_stop_all(void) {
+    for (int j = 0; j < N_MACROS; j++) {
+        macros[j].recording = 0;
+    }
+    is_recording = 0;
+}
+
+void send_magic_string(const char* string) {
+    for (int i = 0; i < 100; i++) {
+        char c = pgm_read_byte(string + i);
+        if (!c) {
+            break;
+        }
+        if (IS_LAYER_ON(XYZZY_CZ)) {
+            switch (c) {
+                case 'Y': c = 'Z'; break;
+                case 'Z': c = 'Y'; break;
+            }
+        }
+        send_char(c);
+    }
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -175,11 +200,25 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         switch (keycode) {
             case XZ_FN: {
                 if (shifted && magic_shift[row][col]) {
-                    send_string_P(magic_shift[row][col]);
-                } else {
-                    send_string_P(magic[row][col]);
+                    send_magic_string(magic_shift[row][col]);
+                } else if (magic[row][col]) {
+                    send_magic_string(magic[row][col]);
                 }
-                send_char(' ');
+                tap_code(KC_SPC);
+            } break;
+            case XZ_L: {
+                if (magic_shift[row][col]) {
+                    send_magic_string(magic_shift[row][col]);
+                }
+                tap_code(KC_SPC);
+            } break;
+            case XZ_Z: {
+                if (IS_LAYER_ON(XYZZY_CZ)) {
+                    send_char('Y');
+                } else {
+                    send_char('Z');
+                }
+                tap_code(KC_SPC);
             } break;
             case XZ_REC: {
                 int i = col % N_MACROS;
@@ -210,17 +249,40 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
     }
     if (is_recording) {
-        for (int i = 0; i < N_MACROS; i++) {
-            if (macros[i].recording) {
-                if (!macros[i].size && !record->event.pressed) {
-                    continue;
-                }
-                macros[i].buf[macros[i].size] = *record;
-                macros[i].size++;
-                if (macros[i].size >= MACRO_BUF_SIZE) {
-                    macro_recording_stop(i);
+        if (!record->event.pressed
+            || (keycode >= KC_A && keycode <= KC_0)
+            || (keycode == KC_ENT)
+            || (keycode == KC_PENT)
+            || (keycode >= KC_TAB && keycode <= KC_SLASH)
+            || (keycode >= KC_KP_SLASH && keycode <= KC_F24)
+            || (keycode == KC_BACKSPACE)
+            || (keycode == XZ_FN)
+            || (keycode == XZ_FN1)
+            || (keycode == XZ_LT)
+            || (keycode == XZ_L)
+            || (keycode == XZ_Z)
+            || (keycode == XZ_MKR)
+            || (keycode >= KC_LEFT_CTRL && keycode <= KC_RIGHT_GUI)
+            || (IS_QK_MOMENTARY(keycode))
+            || (IS_QK_TOGGLE_LAYER(keycode))
+        ) {
+            for (int i = 0; i < N_MACROS; i++) {
+                if (macros[i].recording) {
+                    if (!macros[i].size && !record->event.pressed) {
+                        continue;
+                    }
+                    macros[i].buf[macros[i].size] = *record;
+                    macros[i].size++;
+                    if (macros[i].size >= MACRO_BUF_SIZE) {
+                        macro_recording_stop(i);
+                    }
                 }
             }
+            if (keycode == KC_ENT || keycode == KC_PENT) {
+                macro_recording_stop_all();
+            }
+        } else {
+            macro_recording_stop_all();
         }
     }
     return true;
