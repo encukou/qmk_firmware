@@ -4,6 +4,12 @@
 #include QMK_KEYBOARD_H
 #include "factory.h"
 
+enum _layers {
+    _NUMLOCK,
+    _FN,
+    _FACTORY,
+};
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      /*
      *         ┌────┬────┬────┬────┐
@@ -84,6 +90,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_U,    KC_V,    KC_W,    KC_X
     ),
 };
+
+bool rgb_matrix_indicators_user(void) {
+    uint8_t brightness = 20;  // TODO: use rgb_matrix_get_val() ?
+    if (host_keyboard_led_state().num_lock) {
+        rgb_matrix_set_color( 4, 0, brightness, brightness );
+    } else {
+        rgb_matrix_set_color( 4, 0, 0, 0 );
+    }
+    return true;
+}
 
 bool led_update_user(led_t led_state) {
     // Change layer if numlock state changes, either triggered by OS or
