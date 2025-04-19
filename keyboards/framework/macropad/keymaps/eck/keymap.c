@@ -1,40 +1,128 @@
-// Copyright 2022 Framework Computer
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include QMK_KEYBOARD_H
-#include "factory.h"
 
 enum layers {
     BASE,
+    MAIL,
+    EXTRA,
+    CHORD,
+    SYS,
     ALPHA,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-     /*
-     *         ┌────┬────┬────┬────┐
-     *  4 keys │Esc │Calc│BOOT│ <- │
-     *         ├────┼────┼────┼────┤
-     *  4 keys │ Num│ /  │ *  │ -  │
-     *         ├────┼────┼────┼────┤
-     *  3 keys │ 7  │ 8  │ 9  │ +  │
-     *         ├────┼────┼────┼────┤
-     *  4 keys │ 4  │ 5  │ 6  │ += │
-     *         ├────┼────┼────┼────┤
-     *  3 keys │ 1  │ 2  │ 3  │Entr│
-     *         ├────┼────┼────┼────┤
-     *  3 keys │ 0  │ 0  │ .  │MB1 │
-     *         └────┴────┴────┴────┴
-     * 21 total
+    /*  ┌────┬────┬────┬────┐
+     *  │MAIL│XTRA│CHRD│SYS │
+     *  ├────┼────┼────┼────┤
+     *  │ Num│ /  │ *  │ -  │
+     *  ├────┼────┼────┼────┤
+     *  │ 7  │ 8  │ 9  │ +  │
+     *  ├────┼────┼────┼────┤
+     *  │ 4  │ 5  │ 6  │ += │
+     *  ├────┼────┼────┼────┤
+     *  │ 1  │ 2  │ 3  │Entr│
+     *  ├────┼────┼────┼────┤
+     *  │ 0  │ 0  │ .  │MB1 │
+     *  └────┴────┴────┴────┘
      */
     [BASE] = LAYOUT(
-        KC_ESC,  KC_CALC, QK_BOOT, KC_BSPC,
+        TO(MAIL),TO(EXTRA),TO(CHORD),TO(SYS),
         KC_NUM,  KC_PSLS, KC_PAST, KC_PMNS,
         KC_P7,   KC_P8,   KC_P9,   KC_PPLS,
         KC_P4,   KC_P5,   KC_P6,   KC_EQL,
         KC_P1,   KC_P2,   KC_P3,   KC_PENT,
         KC_P0,   KC_P0,   KC_PDOT, KC_MS_BTN1
     ),
-     /* Alphabet
+     /* ┌────┬────┬────┬────┐
+     *  │(bk)│XTRA│CHRD│SYS │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │ N  │ [  │ ]  │ M  │
+     *  └────┴────┴────┴────┘
+     */
+    [MAIL] = LAYOUT(
+        TO(BASE),TO(EXTRA),TO(CHORD),TO(SYS),
+        _______,  _______, _______, _______,
+        _______,  _______, _______, _______,
+        _______,  _______, _______, _______,
+        _______,  _______, _______, _______,
+        KC_N,     KC_LBRC, KC_RBRC, KC_M
+    ),
+    /*  ┌────┬────┬────┬────┐
+     *  │MAIL│(bk)│CHRD│SYS │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  └────┴────┴────┴────┘
+     */
+    [EXTRA] = LAYOUT(
+        TO(MAIL),TO(BASE),TO(CHORD),TO(SYS),
+        _______,  _______, _______, _______,
+        _______,  _______, _______, _______,
+        _______,  _______, _______, _______,
+        _______,  _______, _______, _______,
+        _______,  _______, _______, _______
+    ),
+    /*  ┌────┬────┬────┬────┐
+     *  │MAIL│XTRA│(bk)│SYS │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  └────┴────┴────┴────┘
+     */
+    [CHORD] = LAYOUT(
+        TO(MAIL),TO(EXTRA),TO(BASE),TO(SYS),
+        _______,  _______, _______, _______,
+        _______,  _______, _______, _______,
+        _______,  _______, _______, _______,
+        _______,  _______, _______, _______,
+        _______,  _______, _______, _______
+    ),
+    /*  ┌────┬────┬────┬────┐
+     *  │MAIL│XTRA│CHRD│(bk)│
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤
+     *  │    │    │    │BOOT│
+     *  └────┴────┴────┴────┘
+     */
+    [SYS] = LAYOUT(
+        TO(MAIL),TO(EXTRA),TO(CHORD),TO(BASE),
+        _______,  _______, _______, _______,
+        _______,  _______, _______, _______,
+        _______,  _______, _______, _______,
+        _______,  _______, _______, _______,
+        _______,  _______, _______, QK_BOOT
+    ),
+    /* Alphabet
      *         ┌────┬────┬────┬────┐
      *  4 keys │ A  │ B  │ C  │ D  │
      *         ├────┼────┼────┼────┤
@@ -64,14 +152,44 @@ void keyboard_post_init_user(void) {
     rgb_matrix_enable_noeeprom();
     rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
     rgb_matrix_sethsv_noeeprom(HSV_OFF);
+    layer_clear();
+    default_layer_set((layer_state_t)1 << BASE);
 }
 
 bool rgb_matrix_indicators_user(void) {
-    uint8_t brightness = 5;  // TODO: use rgb_matrix_get_val() ?
+    uint8_t brightness = 4;  // TODO: use rgb_matrix_get_val() ?
+
     if (host_keyboard_led_state().num_lock) {
         rgb_matrix_set_color( 4, 0, brightness, brightness );
     } else {
         rgb_matrix_set_color( 4, 0, 0, 0 );
     }
+    if (IS_LAYER_ON(MAIL)) {
+        rgb_matrix_set_color( 5, brightness, brightness, brightness );
+    } else {
+        rgb_matrix_set_color( 5, 0, 0, 0 );
+    }
+    if (IS_LAYER_ON(EXTRA)) {
+        rgb_matrix_set_color( 2, brightness, brightness, brightness );
+    } else {
+        rgb_matrix_set_color( 2, 0, 0, 0 );
+    }
+    if (IS_LAYER_ON(CHORD)) {
+        rgb_matrix_set_color(22, brightness, brightness, brightness );
+    } else {
+        rgb_matrix_set_color(22, 0, 0, 0 );
+    }
+    if (IS_LAYER_ON(SYS)) {
+        rgb_matrix_set_color(17, brightness, brightness, brightness );
+        rgb_matrix_set_color(12, brightness, 0, 0 );
+    } else {
+        rgb_matrix_set_color(17, 0, 0, 0 );
+        rgb_matrix_set_color(12, 0, 0, 0 );
+    }
     return true;
+}
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+    rgb_matrix_indicators_user();
+    return state;
 }
