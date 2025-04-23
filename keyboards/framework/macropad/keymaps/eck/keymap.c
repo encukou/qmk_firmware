@@ -37,23 +37,23 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      /* ┌────┬────┬────┬────┐
      *  │(bk)│XTRA│CHRD│SYS │
      *  ├────┼────┼────┼────┤
-     *  │    │    │    │    │
+     *  │Esc │    │    │CSK │  CSK=Ctrl+Shift+K = Quick Filter
      *  ├────┼────┼────┼────┤
      *  │    │    │    │    │
      *  ├────┼────┼────┼────┤
      *  │    │    │    │    │
-     *  ├────┼────┼────┼────┤
-     *  │    │    │    │    │
-     *  ├────┼────┼────┼────┤
-     *  │ N  │ [  │ ]  │ M  │
-     *  └────┴────┴────┴────┘
+     *  ├────┼────┼────┼────┤ R = mark thread read
+     *  │ P  │ B  │ F  │ R  │ B/F = next/previous in list
+     *  ├────┼────┼────┼────┤ P/N = prev/next unread
+     *  │ N  │ [  │ ]  │ M  │ [/] = next/previous seen
+     *  └────┴────┴────┴────┘ M = mark read
      */
     [MAIL] = LAYOUT(
         TO(BASE),TO(EXTRA),TO(CHORD),TO(SYS),
+        KC_ESC,   _______, _______, LCTL(LSFT(KC_K)),
         _______,  _______, _______, _______,
         _______,  _______, _______, _______,
-        _______,  _______, _______, _______,
-        _______,  _______, _______, _______,
+        KC_P,     KC_B,    KC_F,    KC_R,
         KC_N,     KC_LBRC, KC_RBRC, KC_M
     ),
     /*  ┌────┬────┬────┬────┐
@@ -156,37 +156,200 @@ void keyboard_post_init_user(void) {
     default_layer_set((layer_state_t)1 << BASE);
 }
 
+static const int8_t led_indices[24] = {
+     5,  2, 22, 17,
+     4,  0, 20, 18,
+     7,  1, 21, 16,
+     6,  3, 23, 19,
+     9, 11, 15, 13,
+     8, 10, 14, 12
+};
+
+typedef struct {
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+} rgb_color;
+
+static void set_led_colors(rgb_color *colors) {
+    for (int i = 0; i < 24; i++) {
+        rgb_matrix_set_color(
+            led_indices[i],
+            colors[i].r,
+            colors[i].g,
+            colors[i].b);
+    }
+}
+
 bool rgb_matrix_indicators_user(void) {
     uint8_t brightness = 4;  // TODO: use rgb_matrix_get_val() ?
 
-    if (host_keyboard_led_state().num_lock) {
-        rgb_matrix_set_color( 4, 0, brightness, brightness );
-    } else {
-        rgb_matrix_set_color( 4, 0, 0, 0 );
-    }
     if (IS_LAYER_ON(MAIL)) {
-        rgb_matrix_set_color( 5, brightness, brightness, brightness );
+        set_led_colors((rgb_color[24]) {
+            {brightness, brightness, brightness},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {brightness/4, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, brightness/4, brightness/4},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {brightness/4, brightness/4, brightness/4},
+            {0, 0, brightness/4},
+            {0, 0, brightness/4},
+            {brightness/4, brightness/4, brightness/4},
+
+            {brightness/4, brightness/4, brightness/4},
+            {0, brightness/4, brightness/4},
+            {0, brightness/4, brightness/4},
+            {brightness/4, brightness/4, brightness/4},
+        });
+        return true;
+    } else if (IS_LAYER_ON(EXTRA)) {
+        set_led_colors((rgb_color[24]) {
+            {0, 0, 0},
+            {brightness, brightness, brightness},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+        });
+        return true;
+    } else if (IS_LAYER_ON(CHORD)) {
+        set_led_colors((rgb_color[24]) {
+            {0, 0, 0},
+            {0, 0, 0},
+            {brightness, brightness, brightness},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+        });
+        return true;
+    } else if (IS_LAYER_ON(SYS)) {
+        set_led_colors((rgb_color[24]) {
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {brightness, brightness, brightness},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {brightness, 0, 0},
+        });
+        return true;
     } else {
-        rgb_matrix_set_color( 5, 0, 0, 0 );
+        set_led_colors((rgb_color[24]) {
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            (host_keyboard_led_state().num_lock ? (rgb_color){0, brightness, brightness} : (rgb_color){0, 0, 0}),
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {0, 0, brightness/4},
+            {0, 0, brightness/4},
+            {0, 0, brightness/4},
+            {0, 0, 0},
+
+            {0, 0, brightness/4},
+            {0, 0, brightness/4},
+            {0, 0, brightness/4},
+            {0, 0, 0},
+
+            {0, 0, brightness/4},
+            {0, 0, brightness/4},
+            {0, 0, brightness/4},
+            {0, 0, 0},
+
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+        });
+        return true;
     }
-    if (IS_LAYER_ON(EXTRA)) {
-        rgb_matrix_set_color( 2, brightness, brightness, brightness );
-    } else {
-        rgb_matrix_set_color( 2, 0, 0, 0 );
-    }
-    if (IS_LAYER_ON(CHORD)) {
-        rgb_matrix_set_color(22, brightness, brightness, brightness );
-    } else {
-        rgb_matrix_set_color(22, 0, 0, 0 );
-    }
-    if (IS_LAYER_ON(SYS)) {
-        rgb_matrix_set_color(17, brightness, brightness, brightness );
-        rgb_matrix_set_color(12, brightness, 0, 0 );
-    } else {
-        rgb_matrix_set_color(17, 0, 0, 0 );
-        rgb_matrix_set_color(12, 0, 0, 0 );
-    }
-    return true;
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
