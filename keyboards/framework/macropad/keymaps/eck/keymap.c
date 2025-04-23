@@ -11,6 +11,17 @@ enum layers {
     ALPHA,
 };
 
+enum eck_keycodes {
+  EK_CR0 = FW_SAFE_RANGE,  // Chord keys
+  EK_CR1,
+  EK_CR2,
+  EK_CR3,
+  EK_CR4,
+  EK_CR5,
+  EK_CR6,
+  EK_CR7,
+};
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*  ┌────┬────┬────┬────┐
      *  │MAIL│XTRA│CHRD│SYS │
@@ -87,9 +98,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      *  ├────┼────┼────┼────┤
      *  │    │    │    │    │
      *  ├────┼────┼────┼────┤
-     *  │    │    │    │    │
+     *  │ 4  │ 5  │ 6  │ Sp │
      *  ├────┼────┼────┼────┤
-     *  │    │    │    │    │
+     *  │ 1  │ 2  │ 3  │ Sh │
      *  └────┴────┴────┴────┘
      */
     [CHORD] = LAYOUT(
@@ -97,8 +108,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______,  _______, _______, _______,
         _______,  _______, _______, _______,
         _______,  _______, _______, _______,
-        _______,  _______, _______, _______,
-        _______,  _______, _______, _______
+        EK_CR4,   EK_CR5,  EK_CR6,  EK_CR7,
+        EK_CR0,   EK_CR1,  EK_CR2,  EK_CR3
     ),
     /*  ┌────┬────┬────┬────┐
      *  │MAIL│XTRA│CHRD│(bk)│
@@ -148,12 +159,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 };
 
+static uint8_t chord_state;
+static uint8_t chord_held;
+
 void keyboard_post_init_user(void) {
     rgb_matrix_enable_noeeprom();
     rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
     rgb_matrix_sethsv_noeeprom(HSV_OFF);
     layer_clear();
     default_layer_set((layer_state_t)1 << BASE);
+    chord_state = 0;
 }
 
 static const int8_t led_indices[24] = {
@@ -272,15 +287,26 @@ bool rgb_matrix_indicators_user(void) {
             {0, 0, 0},
             {0, 0, 0},
 
-            {0, 0, 0},
-            {0, 0, 0},
-            {0, 0, 0},
-            {0, 0, 0},
+            #define CHORDLED(n) (                                              \
+                    (chord_state & (1<<n)) ? (                                 \
+                        (chord_held & (1<<n))                                  \
+                            ? (rgb_color){brightness, brightness, brightness}  \
+                            : (rgb_color){brightness/2, brightness, brightness}\
+                    ) : (                                                      \
+                        (chord_held & (1<<n))                                  \
+                            ? (rgb_color){brightness/4, 0, 0}                  \
+                            : (rgb_color){0, 0, 0}                             \
+                    )                                                          \
+                )
+            CHORDLED(4),
+            CHORDLED(5),
+            CHORDLED(6),
+            CHORDLED(7),
 
-            {0, 0, 0},
-            {0, 0, 0},
-            {0, 0, 0},
-            {0, 0, 0},
+            CHORDLED(0),
+            CHORDLED(1),
+            CHORDLED(2),
+            CHORDLED(3),
         });
         return true;
     } else if (IS_LAYER_ON(SYS)) {
@@ -355,4 +381,54 @@ bool rgb_matrix_indicators_user(void) {
 layer_state_t layer_state_set_user(layer_state_t state) {
     rgb_matrix_indicators_user();
     return state;
+}
+
+static const uint16_t braille_codes[64] = {
+//     ⠀     ⠁        ⠂        ⠃        ⠄        ⠅        ⠆        ⠇
+    XXXXXXX, KC_A,    XXXXXXX, KC_B,    XXXXXXX, KC_K,    XXXXXXX, KC_L,
+//  ⠈        ⠉        ⠊        ⠋        ⠌        ⠍        ⠎        ⠏
+    XXXXXXX, KC_C,    KC_I,    KC_F,    XXXXXXX, KC_M,    KC_S,    KC_P,
+//  ⠐        ⠑        ⠒        ⠓        ⠔        ⠕        ⠖        ⠗
+    XXXXXXX, KC_E,    XXXXXXX, KC_H,    XXXXXXX, KC_O,    XXXXXXX, KC_R,
+//  ⠘        ⠙        ⠚        ⠛        ⠜        ⠝        ⠞        ⠟
+    XXXXXXX, KC_D,    KC_J,    KC_G,    XXXXXXX, KC_N,    KC_T,    KC_Q,
+//  ⠠        ⠡        ⠢        ⠣        ⠤        ⠥        ⠦        ⠧
+    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_U,    XXXXXXX, KC_V,
+//  ⠨        ⠩        ⠪        ⠫        ⠬        ⠭        ⠮        ⠯
+    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_X,    XXXXXXX, XXXXXXX,
+//  ⠰        ⠱        ⠲        ⠳        ⠴        ⠵        ⠶        ⠷
+    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_Z,    XXXXXXX, XXXXXXX,
+//  ⠸        ⠹        ⠺        ⠻        ⠼        ⠽        ⠾        ⠿
+    XXXXXXX, XXXXXXX, KC_W,    XXXXXXX, XXXXXXX, KC_Y,    XXXXXXX, XXXXXXX
+};
+
+void send_chord(int state) {
+    if (state & 0b10001000) {
+        return;
+    }
+    int braille_state = (state & 0b00000111) | ((state & 0b01110000) >> 1);
+    uint16_t keycode = braille_codes[braille_state];
+    if (keycode) {
+        tap_code16(keycode);
+    }
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+    if (keycode >= EK_CR0 && keycode <= EK_CR7) {
+        int pos = keycode - EK_CR0;
+        int mask = 1 << pos;
+        if (record->event.pressed) {
+            chord_state ^= mask;
+            chord_held |= mask;
+        } else {
+            chord_held &=~ mask;
+            if (!chord_held) {
+                send_chord(chord_state);
+                chord_state = 0;
+            }
+        }
+        rgb_matrix_indicators_user();
+        return false;
+    }
+    return true;
 }
