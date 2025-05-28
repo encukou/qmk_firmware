@@ -72,22 +72,23 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      *  ├────┼────┼────┼────┤ R!: Alt+Gui+Crtl+Shift+R (Record)
      *  │ R! │ S! │    │    │ S!: Alt+Gui+Crtl+Shift+S (Stream)
      *  ├────┼────┼────┼────┤
-     *  │    │    │    │    │
+     *  │    │    │ 0! │ 1! │ 0!: Alt+Gui+Crtl+Shift+NP0 (Switch to scene 0)
      *  ├────┼────┼────┼────┤
-     *  │    │    │    │    │
+     *  │    │    │ 2! │ 3! │
      *  ├────┼────┼────┼────┤
-     *  │    │    │    │    │
-     *  ├────┼────┼────┼────┤ T!: Alt+Gui+Crtl+Shift+S (Transition)
-     *  │ T! │    │    │    │
-     *  └────┴────┴────┴────┘
+     *  │    │    │ 4! │ 5! │
+     *  ├────┼────┼────┼────┤
+     *  │ T! │ C! │ 6! │ 7! │ T!: Alt+Gui+Crtl+Shift+T (Transition)
+     *  └────┴────┴────┴────┘ C!: Alt+Gui+Crtl+Shift+C (Cut)
      */
     [STREAM] = LAYOUT(
         TO(MAIL),TO(BASE),TO(CHORD),TO(SYS),
-        LALT(LGUI(LCTL(LSFT(KC_R)))),LALT(LGUI(LCTL(LSFT(KC_S)))), _______, _______,
-        _______,  _______, _______, _______,
-        _______,  _______, _______, _______,
-        _______,  _______, _______, _______,
-        LALT(LGUI(LCTL(LSFT(KC_T)))), _______,  _______, _______
+#define HKY(K) LALT(LGUI(LCTL(LSFT(K))))
+        HKY(KC_R), HKY(KC_S), _______,    _______,
+        _______,   _______,   HKY(KC_P0), HKY(KC_P1),
+        _______,   _______,   HKY(KC_P2), HKY(KC_P3),
+        _______,   _______,   HKY(KC_P4), HKY(KC_P5),
+        HKY(KC_T), HKY(KC_C), HKY(KC_P6), HKY(KC_P7)
     ),
     /*  ┌────┬────┬────┬────┐
      *  │MAIL│XTRA│(bk)│SYS │
@@ -186,10 +187,8 @@ typedef struct {
     uint8_t b;
 } rgb_color;
 
-static rgb_color stream_rgb_colors[] = {
-    {127, 127, 127},
-    {127, 127, 127},
-};
+static char stream_info[5] = {255};
+static bool stream_info_set = false;
 
 static void set_led_colors(rgb_color *colors) {
     for (int i = 0; i < 24; i++) {
@@ -201,16 +200,15 @@ static void set_led_colors(rgb_color *colors) {
     }
 }
 
-static rgb_color scale(rgb_color c, int scale) {
-    return (rgb_color){
-        c.r * scale / 256,
-        c.g * scale / 256,
-        c.b * scale / 256,
-    };
-}
-
 bool rgb_matrix_indicators_user(void) {
     uint8_t brightness = 4;  // TODO: use rgb_matrix_get_val() ?
+
+#define RED_FULL (rgb_color){brightness, 0, 0}
+#define GRN_FULL (rgb_color){0, brightness, 0}
+#define YLW_FULL (rgb_color){brightness, brightness, 0}
+#define CYA_STBY (rgb_color){0, brightness/4, brightness/4}
+#define BLK_STBY (rgb_color){0, 0, 0}
+#define GRY_STBY (rgb_color){brightness/4, brightness/4, brightness/4}
 
     if (IS_LAYER_ON(MAIL)) {
         set_led_colors((rgb_color[24]) {
@@ -252,30 +250,35 @@ bool rgb_matrix_indicators_user(void) {
             {0, 0, 0},
             {0, 0, 0},
 
-            scale(stream_rgb_colors[0], brightness), // Rec
-            scale(stream_rgb_colors[1], brightness), // Stream
+#define SOURCE(N) (N >= stream_info[1]) ? BLK_STBY : \
+                  (N == stream_info[2]) ? ((N == stream_info[3])?YLW_FULL:RED_FULL) : \
+                  (N == stream_info[3]) ? GRN_FULL : \
+                  GRY_STBY
+
+            (!stream_info_set) ? GRY_STBY : (stream_info[0] & 1) ? RED_FULL : CYA_STBY, // Rec
+            (!stream_info_set) ? GRY_STBY : (stream_info[0] & 2) ? RED_FULL : CYA_STBY, // Stream
             {0, 0, 0},
             {0, 0, 0},
 
             {0, 0, 0},
             {0, 0, 0},
-            {0, 0, 0},
-            {0, 0, 0},
+            SOURCE(0),
+            SOURCE(1),
 
             {0, 0, 0},
             {0, 0, 0},
-            {0, 0, 0},
-            {0, 0, 0},
+            SOURCE(2),
+            SOURCE(3),
 
             {0, 0, 0},
             {0, 0, 0},
-            {0, 0, 0},
-            {0, 0, 0},
+            SOURCE(4),
+            SOURCE(5),
 
             {brightness, brightness, brightness}, // Transition
             {0, 0, 0},
-            {0, 0, 0},
-            {0, 0, 0},
+            SOURCE(6),
+            SOURCE(7),
         });
         return true;
     } else if (IS_LAYER_ON(CHORD)) {
@@ -448,12 +451,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 
 void raw_hid_receive(uint8_t *data, uint8_t length) {
     //raw_hid_send(data, length);
-    for (int i = 0; i+3 < length; i += 4) {
-        int led_idx = data[i];
-        if (led_idx >= sizeof(stream_rgb_colors)/sizeof(stream_rgb_colors[0])) break;
-        stream_rgb_colors[led_idx].r = data[i + 1];
-        stream_rgb_colors[led_idx].g = data[i + 2];
-        stream_rgb_colors[led_idx].b = data[i + 3];
+    if (length > sizeof(stream_info)) {
+        length = sizeof(stream_info);
     }
+    memcpy(stream_info, data, length);
+    stream_info_set = true;
     rgb_matrix_indicators_user();
 }
