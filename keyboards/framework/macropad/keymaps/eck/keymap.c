@@ -5,7 +5,7 @@
 enum layers {
     BASE,
     MAIL,
-    EXTRA,
+    STREAM,
     CHORD,
     SYS,
     ALPHA,
@@ -38,7 +38,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      *  └────┴────┴────┴────┘
      */
     [BASE] = LAYOUT(
-        TO(MAIL),TO(EXTRA),TO(CHORD),TO(SYS),
+        TO(MAIL),TO(STREAM),TO(CHORD),TO(SYS),
         KC_NUM,  KC_PSLS, KC_PAST, KC_PMNS,
         KC_P7,   KC_P8,   KC_P9,   KC_PPLS,
         KC_P4,   KC_P5,   KC_P6,   KC_EQL,
@@ -60,7 +60,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      *  └────┴────┴────┴────┘ M = mark read
      */
     [MAIL] = LAYOUT(
-        TO(BASE),TO(EXTRA),TO(CHORD),TO(SYS),
+        TO(BASE),TO(STREAM),TO(CHORD),TO(SYS),
         KC_ESC,   _______, _______, LCTL(LSFT(KC_K)),
         _______,  _______, _______, _______,
         _______,  _______, _______, _______,
@@ -69,25 +69,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     /*  ┌────┬────┬────┬────┐
      *  │MAIL│(bk)│CHRD│SYS │
+     *  ├────┼────┼────┼────┤ R!: Alt+Gui+Crtl+Shift+R (Record)
+     *  │ R! │ S! │    │    │ S!: Alt+Gui+Crtl+Shift+S (Stream)
      *  ├────┼────┼────┼────┤
      *  │    │    │    │    │
      *  ├────┼────┼────┼────┤
      *  │    │    │    │    │
      *  ├────┼────┼────┼────┤
      *  │    │    │    │    │
-     *  ├────┼────┼────┼────┤
-     *  │    │    │    │    │
-     *  ├────┼────┼────┼────┤
-     *  │    │    │    │    │
+     *  ├────┼────┼────┼────┤ T!: Alt+Gui+Crtl+Shift+S (Transition)
+     *  │ T! │    │    │    │
      *  └────┴────┴────┴────┘
      */
-    [EXTRA] = LAYOUT(
+    [STREAM] = LAYOUT(
         TO(MAIL),TO(BASE),TO(CHORD),TO(SYS),
+        LALT(LGUI(LCTL(LSFT(KC_R)))),LALT(LGUI(LCTL(LSFT(KC_S)))), _______, _______,
         _______,  _______, _______, _______,
         _______,  _______, _______, _______,
         _______,  _______, _______, _______,
-        _______,  _______, _______, _______,
-        _______,  _______, _______, _______
+        LALT(LGUI(LCTL(LSFT(KC_T)))), _______,  _______, _______
     ),
     /*  ┌────┬────┬────┬────┐
      *  │MAIL│XTRA│(bk)│SYS │
@@ -104,7 +104,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      *  └────┴────┴────┴────┘
      */
     [CHORD] = LAYOUT(
-        TO(MAIL),TO(EXTRA),TO(BASE),TO(SYS),
+        TO(MAIL),TO(STREAM),TO(BASE),TO(SYS),
         _______,  _______, _______, _______,
         _______,  _______, _______, _______,
         _______,  _______, _______, _______,
@@ -126,7 +126,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      *  └────┴────┴────┴────┘
      */
     [SYS] = LAYOUT(
-        TO(MAIL),TO(EXTRA),TO(CHORD),TO(BASE),
+        TO(MAIL),TO(STREAM),TO(CHORD),TO(BASE),
         _______,  _______, _______, _______,
         _______,  _______, _______, _______,
         _______,  _______, _______, _______,
@@ -186,6 +186,11 @@ typedef struct {
     uint8_t b;
 } rgb_color;
 
+static rgb_color stream_rgb_colors[] = {
+    {127, 127, 127},
+    {127, 127, 127},
+};
+
 static void set_led_colors(rgb_color *colors) {
     for (int i = 0; i < 24; i++) {
         rgb_matrix_set_color(
@@ -194,6 +199,14 @@ static void set_led_colors(rgb_color *colors) {
             colors[i].g,
             colors[i].b);
     }
+}
+
+static rgb_color scale(rgb_color c, int scale) {
+    return (rgb_color){
+        c.r * scale / 256,
+        c.g * scale / 256,
+        c.b * scale / 256,
+    };
 }
 
 bool rgb_matrix_indicators_user(void) {
@@ -232,20 +245,15 @@ bool rgb_matrix_indicators_user(void) {
             {brightness/4, brightness/4, brightness/4},
         });
         return true;
-    } else if (IS_LAYER_ON(EXTRA)) {
+    } else if (IS_LAYER_ON(STREAM)) {
         set_led_colors((rgb_color[24]) {
             {0, 0, 0},
             {brightness, brightness, brightness},
             {0, 0, 0},
             {0, 0, 0},
 
-            {0, 0, 0},
-            {0, 0, 0},
-            {0, 0, 0},
-            {0, 0, 0},
-
-            {0, 0, 0},
-            {0, 0, 0},
+            scale(stream_rgb_colors[0], brightness), // Rec
+            scale(stream_rgb_colors[1], brightness), // Stream
             {0, 0, 0},
             {0, 0, 0},
 
@@ -260,6 +268,11 @@ bool rgb_matrix_indicators_user(void) {
             {0, 0, 0},
 
             {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+
+            {brightness, brightness, brightness}, // Transition
             {0, 0, 0},
             {0, 0, 0},
             {0, 0, 0},
@@ -431,4 +444,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
         return false;
     }
     return true;
+}
+
+void raw_hid_receive(uint8_t *data, uint8_t length) {
+    //raw_hid_send(data, length);
+    for (int i = 0; i+3 < length; i += 4) {
+        int led_idx = data[i];
+        if (led_idx >= sizeof(stream_rgb_colors)/sizeof(stream_rgb_colors[0])) break;
+        stream_rgb_colors[led_idx].r = data[i + 1];
+        stream_rgb_colors[led_idx].g = data[i + 2];
+        stream_rgb_colors[led_idx].b = data[i + 3];
+    }
+    rgb_matrix_indicators_user();
 }

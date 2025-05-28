@@ -119,6 +119,7 @@ bool via_command_kb(uint8_t *data, uint8_t length) {
   return handle_hid(data, length);
 }
 #ifndef VIA_ENABLE
+__attribute__ ((weak))
 void raw_hid_receive(uint8_t *data, uint8_t length) {
   handle_hid(data, length);
 }
