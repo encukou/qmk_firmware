@@ -91,8 +91,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_ESCAPE,      KC_Q,           KC_W,           KC_B,           KC_J,           KC_BSLASH,      KC_AMPR,                                        KC_TILD,        ST_MACRO_0,     KC_DQUO,        KC_QUOTE,       KC_GRAVE,       ST_MACRO_1,     KC_DELETE,
     KC_INSERT,      KC_K,           KC_P,           KC_D,           KC_H,           KC_LBRACKET,    KC_RBRACKET,                                    KC_DLR,         KC_COMMA,       KC_Y,           KC_U,           KC_O,           KC_SLASH,       KC_PGUP,
     KC_CAPSLOCK,    KC_S,           KC_E,           KC_L,           KC_F,           KC_LPRN,        KC_RPRN,                                                                        KC_EXLM,        KC_DOT,         KC_A,           KC_I,           KC_T,           KC_R,           KC_PGDOWN,
-    MO(4),          KC_Z,           KC_X,           KC_C,           KC_V,           KC_G,                                           KC_UNDS,        KC_N,           KC_M,           KC_EQUAL,       KC_MINUS,       MO(4),
-    KC_LCTRL,       KC_LGUI,        KC_LALT,        MO(2),          LM(1,MOD_LSFT), KC_LCTRL,                                                                                                       KC_RCTRL,       LM(1,MOD_RSFT), MO(2),          KC_RALT,        LT(3,KC_PSCREEN),KC_RCTRL,
+    MO(4),          KC_Z,           KC_X,           KC_C,           KC_V,           KC_G,                                                                                                           KC_UNDS,        KC_N,           KC_M,           KC_EQUAL,       KC_MINUS,       MO(4),
+    KC_LCTRL,       KC_LGUI,        KC_LALT,        MO(2),          LM(1,MOD_LSFT), LGUI(KC_P),                                                                                                     LGUI(KC_S),     LM(1,MOD_RSFT), MO(2),          KC_RALT,        LT(3,KC_PSCREEN),KC_RCTRL,
     KC_SPACE,       KC_BSPACE,      LT(3,KC_PSCREEN),                KC_MS_BTN3,     KC_TAB,         KC_ENTER
   ),
   [1] = LAYOUT_moonlander(
