@@ -251,7 +251,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         if (get_mods() & (MOD_BIT(KC_LSHIFT))) {
             // Unshifted semicolon
             unregister_code(KC_LSHIFT);
+            wait_ms(U_MACRO_DELAY);
             register_code(KC_SEMICOLON);
+            wait_ms(U_MACRO_DELAY);
             register_code(KC_LSHIFT);
             return false;
         } else {
